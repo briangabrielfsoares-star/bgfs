@@ -1,0 +1,59 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function setupAdminEmail() {
+      return signedIn() && request.auth.token.email == "briangabrielfsoares@gmail.com";
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/AdminUsers/$(request.auth.uid))
+        && get(/databases/$(database)/documents/AdminUsers/$(request.auth.uid)).data.active == true;
+    }
+
+    match /AdminUsers/{userId} {
+      allow read: if isAdmin() || (setupAdminEmail() && request.auth.uid == userId);
+      allow create: if setupAdminEmail()
+        && request.auth.uid == userId
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.role == "admin"
+        && request.resource.data.active == true;
+      allow update, delete: if isAdmin();
+    }
+
+    match /PagesContent/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /Services/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /Portfolio/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /Testimonials/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /Settings/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /Leads/{document=**} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

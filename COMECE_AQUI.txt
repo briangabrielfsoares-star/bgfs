@@ -1,0 +1,12 @@
+BGFS Digital — comece aqui
+
+1. Extraia o ZIP.
+2. Abra a pasta no VS Code.
+3. Rode no terminal:
+   npm install
+   npm run dev
+4. Abra http://localhost:3000
+5. Para ativar painel, leads e uploads, abra:
+   http://localhost:3000/admin/setup
+
+O README.md está dentro deste ZIP com o passo a passo completo.
